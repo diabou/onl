@@ -39,11 +39,14 @@ public class Tp2 {
         algo.search(iterations);
 
         new Plot(
-            plotTitle, "#iter", "log(x-x*)", fileName,
+            plotTitle,
+            "#iter",
+            "log(x-x*)",
+            fileName,
             // Stores the iteration number k:  k=1, 2...
             range(0, iterations.size() - 1).mapToDouble(Double::new).toArray(),
             // Stores the logarithm of the distance between f(x_k) and f(x*).
-            iterations.stream().mapToDouble(x -> logDistance(f, x, xopt)).toArray()
+            iterations.stream().limit(N).mapToDouble(x -> logDistance(f, x, xopt)).toArray()
         );
     }
 
@@ -147,7 +150,7 @@ public class Tp2 {
 
 //		steepestAlmostDiag2();
 
-		steepestHilbert();
+//		steepestHilbert();
 //		
 //		steepestRosenbrock();
 //		
