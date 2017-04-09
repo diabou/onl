@@ -1,14 +1,10 @@
 package func;
 
-import util.Matrix;
+import static util.Matrix.makeMatrix;
 
 public class AlmostDiag extends QuadraForm {
 
-    private static Matrix almostDiag(int n) {
-        return makeMatrix(n, params -> params[1] == params[2] ? 1 : - 1.0 / params[0]);
-    }
-
     public AlmostDiag(int n) {
-        super(almostDiag(n));
+        super(makeMatrix(n, (i, j) -> i == j ? 1 : -1.0 / n));
     }
 }

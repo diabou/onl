@@ -1,16 +1,14 @@
 package tests;
 
+import line.LineSearch;
 import org.junit.Test;
 import util.Vector;
-import line.LineSearch;
 
 import static org.junit.Assert.assertEquals;
 
 public class TestLineSearch {
 
 	public static double round_error = 1e-10;
-	
-
 	
 	// A line search that does nothing
 	public static LineSearch s = new LineSearch(new FuncTest1()) {

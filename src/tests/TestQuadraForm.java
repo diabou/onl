@@ -12,9 +12,9 @@ import static org.junit.Assert.assertTrue;
 
 public class TestQuadraForm {
 
-    static Matrix Q = new Matrix(new double[][]{{2, -1}, {-1, 3}});
-    static Vector x = new Vector(new double[]{-3, -3});
-    static QuadraForm q = new QuadraForm(Q);
+    private static Matrix Q = new Matrix(new double[][]{{2, -1}, {-1, 3}});
+    private static Vector x = new Vector(new double[]{-3, -3});
+    private static QuadraForm q = new QuadraForm(Q);
 
     @Test
     public void testEval() {

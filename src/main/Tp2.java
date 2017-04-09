@@ -14,13 +14,12 @@ import util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.log;
+import static java.lang.Math.*;
 import static java.util.stream.IntStream.range;
 
 public class Tp2 {
-    public final static int N = 100;
     public final static double PREC = 1e-8;
+    private final static int N = 100;
 
     /**
      * Run an unconstrained local search algorithm on a problem and plot
@@ -44,7 +43,7 @@ public class Tp2 {
             "log(x-x*)",
             fileName,
             // Stores the iteration number k:  k=1, 2...
-            range(0, iterations.size() - 1).mapToDouble(Double::new).toArray(),
+            range(0, min(N, iterations.size() - 1)).mapToDouble(Double::new).toArray(),
             // Stores the logarithm of the distance between f(x_k) and f(x*).
             iterations.stream().limit(N).mapToDouble(x -> logDistance(f, x, xopt)).toArray()
         );
@@ -150,7 +149,7 @@ public class Tp2 {
 
 //		steepestAlmostDiag2();
 
-//		steepestHilbert();
+        steepestHilbert();
 //		
 //		steepestRosenbrock();
 //		

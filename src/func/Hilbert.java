@@ -1,15 +1,10 @@
 package func;
 
-import util.Matrix;
-
+import static util.Matrix.makeMatrix;
 
 public class Hilbert extends QuadraForm {
 
-    private static Matrix _hilbert(int n) {
-        return makeMatrix(n, params -> 1.0 / (params[1] + params[2] + 1));
-    }
-
     public Hilbert(int n) {
-        super(_hilbert(n));
+        super(makeMatrix(n, (i, j) -> 1.0 / (i + j + 1)));
     }
 }
