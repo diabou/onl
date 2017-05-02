@@ -6,7 +6,6 @@ import java.util.stream.DoubleStream;
 
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
-import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.IntStream.range;
 
@@ -51,18 +50,9 @@ public class Vector {
     /**
      * Create a vector by concatenation of several vectors
      */
-    public Vector(Vector v[]) {
-        // calculate total size
-        int n = stream(v).mapToInt(Vector::size).reduce(0, (x, y) -> x + y);
-        this.n = n;
-        this.tab = new double[n];
-        // fill the vector
-        int k = 0; // index in this vector
-        for (int i = 0; i < v.length; i++) {
-            for (int j = 0; j < v[i].size(); j++) {
-                tab[k++] = v[i].get(j);
-            }
-        }
+    public Vector(Vector vectors[]) {
+        this.tab = Arrays.stream(vectors).flatMap(v -> v.stream().boxed()).mapToDouble(Double::new).toArray();
+        this.n = tab.length;
     }
 
     /**
@@ -73,15 +63,24 @@ public class Vector {
         this.tab = x.clone();
     }
 
-    private Vector makeVector(int n, IntToDoubleFunction valueBuilder) {
+    public static Vector makeVector(int n, IntToDoubleFunction valueBuilder) {
         return new Vector(range(0, n).mapToDouble(valueBuilder).toArray());
     }
 
+    public static void main(String[] args) {
+        System.out.println(new Vector(
+            new Vector[]{
+                makeVector(2, i -> i),
+                makeVector(2, i -> i + 2),
+                makeVector(2, i -> i + 4)
+            }
+        ));
 
-    private DoubleStream doubleStream(int n) {
-        return range(0, n).asDoubleStream();
     }
 
+    private DoubleStream doubleRange(int n) {
+        return range(0, n).asDoubleStream();
+    }
 
     /**
      * Get the sub-vector (x[start],...,x[end])
@@ -89,7 +88,7 @@ public class Vector {
     public Vector subvector(int start, int end) {
         assert (start >= 0);
         assert (end >= start);
-        return new Vector(stream(tab, start, end).toArray());
+        return new Vector(stream(start, end).toArray());
     }
 
     /**
@@ -113,12 +112,19 @@ public class Vector {
         tab[i] = d;
     }
 
+    public DoubleStream stream() {
+        return Arrays.stream(tab);
+    }
+
+    public DoubleStream stream(int start, int end) {
+        return Arrays.stream(tab, start, end);
+    }
+
     /**
      * Set x to y.
      */
     public void set(Vector y) {
-        for (int i = 0; i < n; i++)
-            set(i, y.get(i));
+        tab = y.stream().toArray();
     }
 
     /**
@@ -155,21 +161,21 @@ public class Vector {
      */
     public double scalar(Vector v) {
         assert (n == v.size());
-        return doubleStream(n).reduce(0, (s, i) -> s + get((int) i) * v.get((int) i));
+        return doubleRange(n).reduce(0, (s, i) -> s + get((int) i) * v.get((int) i));
     }
 
     /**
      * Return ||x||.
      */
     public double norm() {
-        return sqrt(stream(tab).reduce(0, (s, i) -> s + pow(i, 2)));
+        return sqrt(stream().reduce(0, (s, i) -> s + pow(i, 2)));
     }
 
     /**
      * Return x as a string.
      */
     public String toString() {
-        return stream(tab).mapToObj(Double::toString).collect(joining(", ", "(", ")"));
+        return stream().mapToObj(Double::toString).collect(joining(", ", "(", ")"));
     }
 
     @Override

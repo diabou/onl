@@ -1,9 +1,14 @@
 package util;
 
 
+import java.util.Arrays;
+import java.util.stream.Stream;
+
+import static java.lang.Math.abs;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.IntStream.range;
+import static util.Vector.makeVector;
 
 /**
  * Matrix (noted "M" in comments)
@@ -55,7 +60,8 @@ public class Matrix {
     }
 
     /**
-     * @param m            Matrix size.
+     * @param m            number of rows
+     * @param n            number of columns
      * @param valueBuilder a function f such as f(i, j) = value of (i, j) coefficient of Q,
      * @return a Matrix whose values are the output of valueBuilder.
      */
@@ -126,9 +132,7 @@ public class Matrix {
      */
     public Vector get_col(int c) {
         assert (c >= 0 && c < nb_cols());
-        Vector v = new Vector(nb_rows());
-        for (int i = 0; i < nb_rows(); i++) v.set(i, get(i, c));
-        return v;
+        return makeVector(nb_rows(), i -> get(i, c));
     }
 
     /**
@@ -229,6 +233,10 @@ public class Matrix {
         return makeMatrix(m, M.nb_cols(), (i, j) -> get_row(i).scalar(M.get_col(j)));
     }
 
+    public Matrix leftmul(double lambda) {
+        return makeMatrix(m, n, (i, j) -> lambda * get(i, j));
+    }
+
     /**
      * @return M as a string
      */
@@ -244,7 +252,6 @@ public class Matrix {
      * @throws SingularMatrixException if M is not invertible
      */
     private void real_LU(Matrix LU, int p[]) throws Singularity {
-
         double TOO_LARGE = 1e30;
 
         assert (m == n);
@@ -252,14 +259,11 @@ public class Matrix {
         assert (n == p.length);
 
         // check the matrix has no "infinite" values
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (Math.abs(get(i, j)) >= TOO_LARGE) throw new Singularity();
-                LU.set(i, j, get(i, j));
-            }
-        }
+        if (steamRows().flatMap(row -> row.stream().boxed()).anyMatch(i -> abs(i) >= TOO_LARGE))
+            throw new Singularity();
 
-        for (int i = 0; i < n; i++) p[i] = i;
+        LU = new Matrix(this);
+        p = range(0, n).toArray();
 
         // LU computation
         double pivot;
@@ -270,7 +274,7 @@ public class Matrix {
             pivot = LU.get(p[i], i);
             for (int j = i + 1; j < n; j++) {
                 double tmp = LU.get(p[j], i);
-                if (Math.abs(tmp) > Math.abs(LU.get(p[swap], i))) swap = j;
+                if (abs(tmp) > abs(LU.get(p[swap], i))) swap = j;
             }
             int tmp = p[i];
             p[i] = p[swap];
@@ -279,7 +283,7 @@ public class Matrix {
 
             pivot = LU.get(p[i], i);
             if (pivot == 0.0) throw new Singularity();
-            if (Math.abs(1 / pivot) >= TOO_LARGE) throw new Singularity();
+            if (abs(1 / pivot) >= TOO_LARGE) throw new Singularity();
 
             for (int j = i + 1; j < n; j++) {
                 for (int k = i + 1; k < n; k++) {
@@ -289,6 +293,10 @@ public class Matrix {
                 LU.set(p[j], i, LU.get(p[j], i) / pivot);
             }
         }
+    }
+
+    private Stream<Vector> steamRows() {
+        return Arrays.stream(rows);
     }
 
     /*
@@ -315,14 +323,14 @@ public class Matrix {
         //cout << " x1=" << x << endl;
 
         // solve Uy=x
-        if (Math.abs(LU.get(p[n - 1], n - 1)) <= TOO_SMALL) throw new Singularity();
+        if (abs(LU.get(p[n - 1], n - 1)) <= TOO_SMALL) throw new Singularity();
         x.set(n - 1, x.get(n - 1) / LU.get(p[n - 1], n - 1));
 
         for (int i = n - 2; i >= 0; i--) {
             for (int j = i + 1; j < n; j++) {
                 x.set(i, x.get(i) - LU.get(p[i], j) * x.get(j));
             }
-            if (Math.abs(LU.get(p[i], i)) <= TOO_SMALL) throw new Singularity();
+            if (abs(LU.get(p[i], i)) <= TOO_SMALL) throw new Singularity();
             x.set(i, x.get(i) / LU.get(p[i], i));
         }
         //cout << " x2=" << x << endl;

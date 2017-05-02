@@ -34,6 +34,7 @@ public class Tp2 {
      */
     private static void run(RealFunc f, Vector xopt, Vector x0, Algorithm algo, String plotTitle, String fileName) {
         List<Vector> iterations = new ArrayList<>();
+        algo.log = true;
         algo.start(x0);
         algo.search(iterations);
 
@@ -70,10 +71,7 @@ public class Tp2 {
         RealFunc almostDiag5 = new AlmostDiag(5);
         Vector zero5 = new Vector(new double[]{0, 0, 0, 0, 0});
 
-        Vector x0 = new Vector(5);
-
-		
-		/* TO DO */
+        Vector x0 = new Vector(new double[]{0.74536, 1.21120, 1.21120, 1.21120, 1.21120});
 
         run(almostDiag5,
             zero5,
@@ -147,18 +145,16 @@ public class Tp2 {
 
         steepestAlmostDiag1();
 
-//		steepestAlmostDiag2();
+        steepestAlmostDiag2();
 
         steepestHilbert();
-//		
-//		steepestRosenbrock();
-//		
-//		conjgradAlmostDiag();
-//		
-//		conjgradHilbert();
-//		
-//		conjgradRosenbrock();
 
+        steepestRosenbrock();
 
+        conjgradAlmostDiag();
+
+        conjgradHilbert();
+
+        conjgradRosenbrock();
     }
 }
